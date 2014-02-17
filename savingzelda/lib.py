@@ -17,3 +17,11 @@ def get_links(html):
     for link in soup.find_all('a'):
         list_of_links.append(link.get('href'))
     return list_of_links
+
+
+def check_links(list_of_links):
+    links_and_status = {}
+    for link in list_of_links:
+        response = requests.get(link)
+        links_and_status[link] = response.status_code
+    return links_and_status

@@ -2,7 +2,7 @@ import httpretty
 import pytest
 import os
 from bs4 import BeautifulSoup
-from savingzelda import get_page, get_links
+from savingzelda import get_page, get_links, check_links
 
 
 here = os.path.dirname(os.path.abspath(__file__))
@@ -49,3 +49,19 @@ def test_get_links_should_return_a_valid_list_of_links():
 def test_get_links_should_return_empty_list_if_no_links_are_found():
     body = html_data("without-links.html")
     assert [] == get_links(body)
+
+
+@httpretty.activate
+def test_check_links_should_return_a_dictionary_with_links_and_status():
+    httpretty.register_uri(httpretty.GET, "http://renatacarreira.com",
+                           body= html_data("simple.html"),
+                           status=200)
+    httpretty.register_uri(httpretty.GET, "https://github.com/recarreira",
+                           body= html_data("simple.html"),
+                           status=404)
+    links = ["http://renatacarreira.com", "https://github.com/recarreira"]
+    assert {"http://renatacarreira.com": 200, "https://github.com/recarreira": 404} == check_links(links)
+
+
+def test_check_links_should_return_an_empty_dictionary_given_an_empy_list():
+    assert {} == check_links([])
