@@ -2,7 +2,7 @@ import httpretty
 import pytest
 import os
 from bs4 import BeautifulSoup
-from savingzelda import get_page
+from savingzelda import get_page, get_links
 
 
 here = os.path.dirname(os.path.abspath(__file__))
@@ -10,8 +10,8 @@ TESTS_DATA = os.path.join(here, 'data')
 
 
 def html_data(file_name):
-  file = open(os.path.join(TESTS_DATA, file_name),'r')
-  return file.read()
+    file = open(os.path.join(TESTS_DATA, file_name),'r')
+    return file.read()
 
 @httpretty.activate
 def test_get_page_should_return_body_content_for_a_200_status_code_page():
@@ -40,3 +40,12 @@ def test_get_page_should_return_proper_html_content():
     soup = BeautifulSoup(get_page("http://github.com/"))
     assert "Renata Carreira" == soup.title.string
 
+
+def test_get_links_should_return_a_valid_list_of_links():
+    body = html_data("simple.html")
+    assert ["http://renatacarreira.com", "https://github.com/recarreira"] == get_links(body)
+
+
+def test_get_links_should_return_empty_list_if_no_links_are_found():
+    body = html_data("without-links.html")
+    assert [] == get_links(body)
