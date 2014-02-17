@@ -25,3 +25,11 @@ def check_links(list_of_links):
         response = requests.get(link)
         links_and_status[link] = response.status_code
     return links_and_status
+
+
+def can_we_save_the_day(links_and_status):
+    alive = True
+    for link in links_and_status:
+        if links_and_status[link] != 200:
+            alive = False
+    return alive

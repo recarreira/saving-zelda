@@ -2,7 +2,7 @@ import httpretty
 import pytest
 import os
 from bs4 import BeautifulSoup
-from savingzelda import get_page, get_links, check_links
+from savingzelda import get_page, get_links, check_links, can_we_save_the_day
 
 
 here = os.path.dirname(os.path.abspath(__file__))
@@ -65,3 +65,12 @@ def test_check_links_should_return_a_dictionary_with_links_and_status():
 
 def test_check_links_should_return_an_empty_dictionary_given_an_empy_list():
     assert {} == check_links([])
+
+
+def test_dict_with_all_status_code_200_should_save_the_day():
+    links_and_status =  {"http://renatacarreira.com": 200, "https://github.com/recarreira": 200}
+    assert True == can_we_save_the_day(links_and_status)
+
+def test_dict_with_one_non_200_status_code_should_let_hyrule_down():
+    links_and_status = {"http://renatacarreira.com": 404, "https://github.com/recarreira": 200}
+    assert False == can_we_save_the_day(links_and_status)
