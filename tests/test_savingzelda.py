@@ -23,7 +23,8 @@ def test_get_page_should_return_body_content_for_a_200_status_code_page():
                            body="here is the mocked body",
                            status=200)
     saving_zelda = SavingZelda(**zelda_args)
-    assert "here is the mocked body" == saving_zelda.get_page("http://github.com")
+    saving_zelda.get_page("http://github.com")
+    assert "here is the mocked body" == saving_zelda.body
 
 
 @httpretty.activate
@@ -45,22 +46,36 @@ def test_get_page_should_return_proper_html_content():
                            body= html_data("simple.html"),
                            status=200)
     saving_zelda = SavingZelda(**zelda_args)
-
-    soup = BeautifulSoup(saving_zelda.get_page("http://github.com/"))
+    saving_zelda.get_page("http://github.com/")
+    soup = BeautifulSoup(saving_zelda.body)
     assert "Renata Carreira" == soup.title.string
 
 
 def test_get_links_should_return_a_valid_list_of_links():
     body = html_data("simple.html")
     saving_zelda = SavingZelda(**zelda_args)
-    assert ["http://renatacarreira.com", "https://github.com/recarreira"] == saving_zelda.get_links(body)
+    saving_zelda.get_links(body)
+    assert ["http://renatacarreira.com", "https://github.com/recarreira"] == saving_zelda.list_of_links
 
 
 def test_get_links_should_return_empty_list_if_no_links_are_found():
     body = html_data("without-links.html")
     saving_zelda = SavingZelda(**zelda_args)
-    assert [] == saving_zelda.get_links(body)
+    saving_zelda.get_links(body)
+    assert [] == saving_zelda.list_of_links
 
+def test_get_links_should_ignore_when_found_a_mailto_link():
+    body = html_data("mailto.html")
+    saving_zelda = SavingZelda(**zelda_args)
+    saving_zelda.get_links(body)
+    assert ["http://renatacarreira.com", "https://github.com/recarreira"] == saving_zelda.list_of_links
+
+
+def test_get_links_should_ignore_when_found_non_link_hrefs():
+    body = html_data("whatever.html")
+    saving_zelda = SavingZelda(**zelda_args)
+    saving_zelda.get_links(body)
+    assert ["http://renatacarreira.com"] == saving_zelda.list_of_links
 
 @httpretty.activate
 def test_check_links_should_return_a_dictionary_with_links_and_status():
@@ -71,14 +86,15 @@ def test_check_links_should_return_a_dictionary_with_links_and_status():
                            body= html_data("simple.html"),
                            status=404)
     saving_zelda = SavingZelda(**zelda_args)
-
     links = ["http://renatacarreira.com", "https://github.com/recarreira"]
-    assert {"http://renatacarreira.com": 200, "https://github.com/recarreira": 404} == saving_zelda.check_links(links)
+    saving_zelda.check_links(links)
+    assert {"http://renatacarreira.com": 200, "https://github.com/recarreira": 404} == saving_zelda.links_and_status
 
 
 def test_check_links_should_return_an_empty_dictionary_given_an_empy_list():
     saving_zelda = SavingZelda(**zelda_args)
-    assert {} == saving_zelda.check_links([])
+    saving_zelda.check_links([])
+    assert {} == saving_zelda.links_and_status
 
 
 def test_dict_with_all_status_code_200_should_save_the_day():
