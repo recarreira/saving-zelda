@@ -11,7 +11,6 @@ class SavingZelda(object):
         self.url = url
         self.body = ""
         self.not_checked = []
-        self.too_many_redirects = []
         self.list_of_links = []
         self.links_and_status = {}
         self.dead_links = {}
@@ -44,14 +43,21 @@ class SavingZelda(object):
                 self.not_checked.append(href)
 
 
+    def check_link(self, link):
+        print "Checking {0}".format(link)
+        try:
+            response = requests.get(link, verify=False, allow_redirects=True)
+            status = response.status_code
+        except requests.exceptions.ConnectionError:
+            status = "Nodename nor servname provided, or not known"
+        except Exception, e:
+            status = str(e)
+        self.links_and_status[link] = status
+
+
     def check_links(self, list_of_links):
         for link in list_of_links:
-            print "Checking {0}".format(link)
-            try:
-                response = requests.get(link, verify=False, allow_redirects=True)
-                self.links_and_status[link] = response.status_code
-            except requests.exceptions.TooManyRedirects:
-                self.too_many_redirects.append(link)
+            self.check_link(link)
 
 
     def can_we_save_the_day(self, links_and_status):
@@ -73,8 +79,6 @@ class SavingZelda(object):
         else:
             self.get_dead_links(self.links_and_status)
             print "Oh no! Hyrule is in great danger! Dead link found: {0}".format(self.dead_links)
-        if self.too_many_redirects:
-            print "But we could not verify some of the links because of too many redirects: {0}".format(self.too_many_redirects)
         print "Links not checked: {0}".format(self.not_checked)
 
 

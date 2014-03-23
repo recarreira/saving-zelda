@@ -90,6 +90,23 @@ def test_get_links_should_ignore_when_found_non_link_hrefs():
     saving_zelda.get_links(body)
     assert ["http://renatacarreira.com"] == saving_zelda.list_of_links
 
+
+@httpretty.activate
+def test_check_link_should_append_link_and_status_for_a_valid_link():
+    httpretty.register_uri(httpretty.GET, "http://renatacarreira.com",
+                           body= html_data("simple.html"),
+                           status=200)
+    saving_zelda = SavingZelda(**zelda_args)
+    saving_zelda.check_link("http://renatacarreira.com")
+    assert {"http://renatacarreira.com": 200,} == saving_zelda.links_and_status
+
+
+def test_check_link_should_cry_when_given_an_invalid_url():
+    saving_zelda = SavingZelda(**zelda_args)
+    saving_zelda.check_link("http://this.url.does.not.have.a.valid.status.code.renatacarreira.com")
+    assert {"http://this.url.does.not.have.a.valid.status.code.renatacarreira.com": "Nodename nor servname provided, or not known",} == saving_zelda.links_and_status
+
+
 @httpretty.activate
 def test_check_links_should_return_a_dictionary_with_links_and_status():
     httpretty.register_uri(httpretty.GET, "http://renatacarreira.com",
