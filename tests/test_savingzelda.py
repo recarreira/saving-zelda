@@ -28,7 +28,7 @@ def test_get_page_should_return_body_content_for_a_200_status_code_page():
 
 
 @httpretty.activate
-def test_get_page_should_return_error_message_for_a_non_200_status_code_page():
+def test_get_page_should_return_error_message_for_a_404_status_code_page():
     httpretty.register_uri(httpretty.GET, "http://github.com/",
                            body="here is the mocked body",
                            status=404)
@@ -38,6 +38,19 @@ def test_get_page_should_return_error_message_for_a_non_200_status_code_page():
         saving_zelda.get_page("http://github.com/")
 
     assert "Oops! The page returned a status code 404" == context.value.message
+
+
+@httpretty.activate
+def test_get_page_should_return_error_message_for_a_403_status_code_page():
+    httpretty.register_uri(httpretty.GET, "http://github.com/",
+                           body="here is the mocked body",
+                           status=403)
+    saving_zelda = SavingZelda(**zelda_args)
+
+    with pytest.raises(Exception) as context:
+        saving_zelda.get_page("http://github.com/")
+
+    assert "Oops! The page returned a status code 403" == context.value.message
 
 
 @httpretty.activate
