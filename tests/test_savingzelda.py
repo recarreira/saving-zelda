@@ -1,6 +1,7 @@
 import httpretty
 import pytest
 import os
+import logging
 from bs4 import BeautifulSoup
 from savingzelda import SavingZelda
 
@@ -8,8 +9,21 @@ from savingzelda import SavingZelda
 here = os.path.dirname(os.path.abspath(__file__))
 TESTS_DATA = os.path.join(here, 'data')
 
+def create_logger():
+    handler = logging.FileHandler(os.path.join(here, 'logs', 'test.log'))
+    formatter = logging.Formatter('%(asctime)s [%(name)s] %(levelname)s %(message)s')
+    handler.setFormatter(formatter)
+    logger = logging.getLogger("test Shooter")
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
+    return logger
+
+
+logger = create_logger()
+
 zelda_args = {
    'url': 'http://github.com',
+   'logger': logger,
 }
 
 def html_data(file_name):
