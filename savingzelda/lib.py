@@ -59,6 +59,7 @@ class SavingZelda(object):
 
 
     def check_links(self, list_of_links):
+        self.logger.info("Checking links...")
         for link in list_of_links:
             self.check_link(link)
 
