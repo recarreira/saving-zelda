@@ -18,11 +18,11 @@ class SavingZelda(object):
         self.links_by_status = {}
 
     def get_page(self, url):
-        r = requests.get(url, verify=False)
-        if r.status_code == 200:
-            self.body = r.text
+        response = requests.get(url, verify=False)
+        if response.status_code == 200:
+            self.body = response.text
         else:
-            message = 'Oops! The page returned a status code {status}'.format(status=str(r.status_code))
+            message = 'Oops! The page returned a status code {status}'.format(status=str(response.status_code))
             raise Exception(message)
 
     def get_links(self, html):
@@ -58,6 +58,11 @@ class SavingZelda(object):
         self.logger.info("Checking links...")
         for link in list_of_links:
             self.check_link(link)
+
+    def is_recursive(self, link):
+        base_url_parsed = urlparse(self.url)
+        link_parsed = urlparse(link)
+        return link_parsed.netloc == base_url_parsed.netloc
 
     def can_we_save_the_day(self, links_and_status):
         return links_and_status.values().count(200) == len(links_and_status)

@@ -23,7 +23,7 @@ def create_logger():
 logger = create_logger()
 
 zelda_args = {
-    'url': 'http://github.com',
+    'url': 'http://httpbin.org',
     'logger': logger,
 }
 
@@ -132,6 +132,12 @@ def test_check_links_should_return_a_dictionary_with_links_and_status():
     expected_results = {"http://httpbin.org/status/200": 200,
                         "http://httpbin.org/status/404": 404}
     assert expected_results == saving_zelda.links_and_status
+
+
+def test_recursive_should_return_true_if_the_link_is_from_the_same_domain():
+    saving_zelda = SavingZelda(**zelda_args)
+    recursive = saving_zelda.is_recursive("http://httpbin.org/links/2")
+    assert recursive is True
 
 
 def test_check_links_should_return_an_empty_dictionary_given_an_empy_list():
