@@ -4,5 +4,5 @@ __pycache__
 savingzelda.egg-info/
 .coverage
 dist/
-tests/logs/
+tests/logs/test.log
 build/
