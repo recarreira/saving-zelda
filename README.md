@@ -21,6 +21,9 @@ $ pip install savingzelda
 $ savingzelda -u <url>
 ```
 
+### Dependencies
+> python 2.7
+
 ---
 
 ## How to contribute
