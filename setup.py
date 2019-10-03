@@ -19,6 +19,6 @@ setup(
     ],
     install_requires=[
         'beautifulsoup4==4.3.2',
-        'requests==2.2.1',
+        'requests==2.20.0',
     ],
 )
